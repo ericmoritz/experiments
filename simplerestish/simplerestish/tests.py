@@ -81,6 +81,10 @@ class SampleEntry(simplerestish.Entry):
             return http.not_found([], '')
 
 
+class NothingResource(simplerestish.Entry):
+    """This resource implements nothing"""
+    pass
+
 class DBMiddleware(object):
     def __init__(self, application):
         self.application = application
@@ -244,3 +248,15 @@ class EntryTestCase(unittest.TestCase):
         resp = req.get_response(self.app)
         self.assertEqual(resp.status, "404 Not Found")
 
+
+class TestNotImplemented(unittest.TestCase):
+    def setUp(self):
+        self.app = RestishApp(NothingResource(""))
+
+    def test_not_implemented(self):
+        for method in ["GET", "POST", "DELETE", "PUT"]:
+            req = Request.blank("/")
+            req.method = method
+            resp = req.get_response(self.app)
+            
+            self.assertEqual(resp.status, "405 Method Not Allowed")

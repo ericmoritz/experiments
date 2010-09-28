@@ -1,7 +1,10 @@
 from restish import resource
+from restish.resource import _metaResource
+
 from simplerestish import http
 from simplerestish import formatters
 import webob.exc
+from functools import wraps
 
 class BodyReadWrite(object):
     formatters = {
@@ -34,34 +37,60 @@ class BodyReadWrite(object):
 
         return mimetype, self.formatters[mimetype].dumps(doc)
 
+def make_handler(http_method):
+    # This creates a new method for a Entry sub-class so that it'll call
+    # Entry.{http_method}
 
-class EntryInterface(object):
+    def methodHandler(self, request):
+        # Get the super proxy
+        proxy = super(self.__class__, self)
 
-    # Entry methods
-    def read(self, request):
-        raise NotImplementedError()
+        # Get the appropriate handler for the HTTP method
+        func = getattr(proxy, http_method)
 
-    def write(self, request):
-        raise NotImplementedError()
+        # Call the handler with the request
+        return func(request)
+    return methodHandler
 
-    def delete(self, request):
-        raise NotImplementedError()
+class _metaEntry(_metaResource):
+    def __new__(cls, name, bases, clsargs):
+        """This is some magic that applies the resource.GET|PUT|DELETE|POST
+        decorators on Entry's GET|PUT|DELETE|POST methods if the appropriate
+        read|write|delete|append method existst in the child class.  It's
+        really ugly and probably doesn't allow Entry sub-classes to be
+        subclassed themselves"""
 
-    # Collection methods
-    def list(self, request):
-        raise NotImplementedError()
+        # Detect if one of the bases is a Entry class
+        parents = [b for b in bases if isinstance(b, _metaEntry)]
 
-    def append(self, request, doc):
-        raise NotImplementedError()
+        # If a Entry parent was detected, decorate the appropriate
+        # Entry methods if the appropriate read/write/delete or append
+        # method was found
+        if len(parents) > 0:
+            method_map = {
+                'read': 'GET',
+                'write': 'PUT',
+                'delete': 'DELETE',
+                'append': 'POST',
+                }
+            for cls_method, http_method in method_map.items():
+                if cls_method in clsargs:
+                    wrapper = getattr(resource, http_method)()
+                    methodHandler = make_handler(http_method)
+                    clsargs[http_method] = wrapper(methodHandler)
+
+        return _metaResource.__new__(cls, name, bases, clsargs)
 
 
+class Entry(resource.Resource, BodyReadWrite):
 
-class Entry(resource.Resource, BodyReadWrite, EntryInterface):
+    __metaclass__ = _metaEntry
+
     def __init__(self, entry_id):
         self.entry_id = entry_id
-
-    @resource.GET()
+                
     def GET(self, request):
+
         doc = self.read(request)
         if doc is not None:
             try:
@@ -72,7 +101,6 @@ class Entry(resource.Resource, BodyReadWrite, EntryInterface):
         else:
             return http.not_found()
 
-    @resource.PUT()
     def PUT(self, request):
         try:
             doc = self.request_entity(request)
@@ -83,11 +111,9 @@ class Entry(resource.Resource, BodyReadWrite, EntryInterface):
         
         return result 
 
-    @resource.DELETE()
     def DELETE(self, request):
         return self.delete(request)
 
-    @resource.POST()
     def POST(self, request):
         try:
             doc = self.request_entity(request)
@@ -98,3 +124,5 @@ class Entry(resource.Resource, BodyReadWrite, EntryInterface):
         
         return result 
 
+def install(entry_cls):
+    pass
