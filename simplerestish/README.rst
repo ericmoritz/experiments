@@ -42,13 +42,14 @@ Simplifed Response values
 HTTP has a standard response for CREATED, however there is no standard for
 UPDATED, DELETED and APPEND.  Let's created standard responses for those.
 
-    http.updated(): restish.http.Response
-       Returns a 200 OK with a Location header
-    http.appended(): restish.http.Response
-       Returns a 200 OK with a Location header
-    http.deleted(): restish.http.Response
-       Returns a 200 OK
-
+http.updated(): restish.http.Response
+    Returns a 200 OK with a Location header
+    
+http.appended(): restish.http.Response
+   Returns a 200 OK with a Location header
+    
+http.deleted(): restish.http.Response
+   Returns a 200 OK
 
 Generic serialization of returned dictionaries
 -----------------------------------------------
