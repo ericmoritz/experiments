@@ -3,9 +3,11 @@ resource to be templated using a template engine as well as expose the
 underlining document using some kind of serialization method.  What format that
 will be returned is solely determined by the client's Accept header.
 
-Currently everything is designed in terms of `restish`, this dependency my be
-removed and the only dependency will be `webob`
+Currently everything is designed in terms of restish_, this dependency my be
+removed and the only dependency will be webob_
 
+.. _restish: http://ish.io/projects/show/restish
+.. _webob: http://pythonpaste.org/webob/
 Goals
 ======
 
