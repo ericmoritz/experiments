@@ -7,13 +7,13 @@ will be returned is solely determined by the client's Accept header.
 Goals
 ======
 
- * Simplified Resource class
- * Simplified REST based Responses
- * Generic serialization of returned dictionaries into response entity body
- * Automatic deserialization request entity bodies
- * If the client accepts HTML/XHTML, allow templating
- * Allow transformation of the document for HTML rendering
- * The browser is a REST client
+* Simplified Resource class
+* Simplified REST based Responses
+* Generic serialization of returned dictionaries into response entity body
+* Automatic deserialization request entity bodies
+* If the client accepts HTML/XHTML, allow templating
+* Allow transformation of the document for HTML rendering
+* The browser is a REST client
 
 
 Simplifed Recource class
