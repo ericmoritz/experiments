@@ -21,14 +21,17 @@ Simplifed Recource class
 HTTP methods map to the generic verbs: read, write, delete, and append.  Let's
 abstract the HTTP methods away to make REST super easy.
 
-    read(): dict
-       This maps to GET
-    write(doc): restish.http.Response
-       This maps to PUT
-    append(doc): restish.http.Response
-       This maps to POST
-    delete(): restish.http.Response
-       This maps to DELETE
+read(): dict
+  This maps to GET
+
+write(doc): restish.http.Response
+  This maps to PUT
+    
+append(doc): restish.http.Response
+  This maps to POST
+    
+delete(): restish.http.Response
+  This maps to DELETE
 
 Tada, there's our simple Resource class.   We no longer need to worry about 
 what GET/POST/PUT/DELETE needs to do.
