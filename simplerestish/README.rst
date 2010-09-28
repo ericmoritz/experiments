@@ -35,7 +35,7 @@ delete(request): restish.http.Response
 
 allow(request): list
   This maps to OPTION. The list will contain the names of the
-  above methods if they're allowed given the request
+  above methods if they're allowed given the request credentials (whatever those may by)
 
 Tada, there's our simple Resource class.   We no longer need to worry about 
 what GET/POST/PUT/DELETE needs to do.
