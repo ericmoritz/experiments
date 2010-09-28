@@ -4,7 +4,7 @@ underlining document using some kind of serialization method.  What format that
 will be returned is solely determined by the client's Accept header.
 
 Currently this prototype is defined in terms of restish_. Idealy, this framework
-would be native WSGI and only use webob.
+would be native WSGI and only use webob_.
 
 .. _restish: http://ish.io/projects/show/restish
 .. _webob: http://pythonpaste.org/webob/
