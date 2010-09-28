@@ -38,7 +38,8 @@ allow(request): list
   above methods if they're allowed given the request credentials (whatever those may by)
 
 Tada, there's our simple Resource class.   We no longer need to worry about 
-what GET/POST/PUT/DELETE needs to do.
+what GET/POST/PUT/DELETE/OPTION needs to do.  
+
 
 Simplifed Response values
 --------------------------
