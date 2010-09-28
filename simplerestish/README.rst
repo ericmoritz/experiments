@@ -3,11 +3,7 @@ resource to be templated using a template engine as well as expose the
 underlining document using some kind of serialization method.  What format that
 will be returned is solely determined by the client's Accept header.
 
-Currently this prototype is defined in terms of restish_. Idealy, this framework
-would be native WSGI and only use webob_.
 
-.. _restish: http://ish.io/projects/show/restish
-.. _webob: http://pythonpaste.org/webob/
 Goals
 ======
 
@@ -55,6 +51,10 @@ http.appended(): restish.http.Response
 http.deleted(): restish.http.Response
    Returns a 200 OK
 
+We don't have to worry about HEAD or OPTION because restish handles those for
+us.
+
+
 Generic serialization of returned dictionaries
 -----------------------------------------------
 HTTP has a standard mechanism to determine what format the client wants the
@@ -85,3 +85,18 @@ The browser is a REST client
 Assuming the client is authorized, The browser should be able to
 append data to a resource using a HTML form POST or write data using a
 an AJAX PUT.
+
+
+Formatters
+===================
+
+Default
+--------
+Resources should by default accept and respond with the following formats: application/json, application/bson.
+
+If a template is assigned to the resource, then the it should all respond to clients accepting that format.
+
+Provided
+------------
+We could also provide other formatters.  For instance, an atom or rss formatter my be available, give some sort of
+resource transformation process is in place for turning a resource into a ATOM or RSS feed.
