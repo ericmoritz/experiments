@@ -5,7 +5,7 @@ version = '0.1'
 
 setup(name='simplerestish',
       version=version,
-      description="A really simple interface to restish",
+      description="A really simple API to restish",
       long_description="""\
 """,
       classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -15,8 +15,8 @@ setup(name='simplerestish',
       url='',
       license='',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
-      test_suite="nose.collector",
       include_package_data=True,
+      test_suite="nose.collector",
       zip_safe=False,
       install_requires=[
           # -*- Extra requirements: -*-
