@@ -56,11 +56,11 @@ class BlogDBBase(unittest.TestCase):
         self.db = {}
         self.db['/simple-blog-post'] = {'title': u"This is a simple post",
                                         'body': u"This is the blog body"}
-        self.app = PythonicREST(blog_factory)
+        self.app = PythonicREST(blog_factory,
+                                allow=["GET", "PUT", "DELETE"])
         
 
-
-class TestBlogGet(BlogDBBase):
+class TestBlogGET(BlogDBBase):
 
     def test_valid(self):
         req = Request.blank("/simple-blog-post")
@@ -76,6 +76,7 @@ class TestBlogGet(BlogDBBase):
         result = data
         self.assertEqual(expect, result)
 
+
     def test_notfound(self):
         req = Request.blank("/not-found")
         req.environ['db'] = self.db
@@ -87,7 +88,7 @@ class TestBlogGet(BlogDBBase):
         result = response.status
         
 
-class TestBlogSet(BlogDBBase):
+class TestBlogPUT(BlogDBBase):
 
     def test_create(self):
         req = Request.blank("/this-is-new")
@@ -95,9 +96,9 @@ class TestBlogSet(BlogDBBase):
 
         req.method = "PUT"
         req.content_type = "application/json"
+        
         req.body = json.dumps({'title': u"This is a new entry",
-                               'body': u"This is a new body"})
-
+                    'body': u"This is a new body"})
         resp = req.get_response(self.app)
         
         self.assertEqual("201 Created", resp.status)
@@ -109,7 +110,7 @@ class TestBlogSet(BlogDBBase):
         req.method = "PUT"
         req.content_type = "application/json"
         req.body = json.dumps({'title': u"I updated your title!",
-                               'body': u"I updated you body!"})
+                    'body': u"I updated you body!"})
 
         resp = req.get_response(self.app)
         
@@ -124,7 +125,7 @@ class TestBlogSet(BlogDBBase):
         req.method = "PUT"
         req.content_type = "application/json"
         req.body = json.dumps({'title': u"This is a new entry",
-                               'body': u"This is a new body"})
+                    'body': u"This is a new body"})
 
         resp = req.get_response(self.app)
         
@@ -145,7 +146,7 @@ class TestBlogSet(BlogDBBase):
         self.assertEqual("400 Bad Request", resp.status)
 
 
-class TestBlogDelete(BlogDBBase):
+class TestBlogDELETE(BlogDBBase):
 
     def test_delete(self):
         req = Request.blank("/simple-blog-post")
@@ -165,4 +166,45 @@ class TestBlogDelete(BlogDBBase):
 
         resp = req.get_response(self.app)
         self.assertEqual("404 Not Found", resp.status)
+
+
+class TestBlogPOST(BlogDBBase):
+    def test_notallowed(self):
+        req = Request.blank("/")
+        req.method = "POST"
+        req.environ['db'] = self.db
+
+        req.body = json.dumps({'title': u"This is a new item...",
+                               'body': u"This is a new body..."})
+
+        resp = req.get_response(self.app)
+        
+        self.assertEqual("405 Method Not Allowed", resp.status)
+        self.assertEqual(("GET", "PUT", "DELETE", "HEAD", "OPTION"),
+                         resp.allow)
+
+                       
+class TestBlogHEAD(BlogDBBase):
+    
+    def test_valid(self):
+        req = Request.blank("/simple-blog-post")
+        req.method = "HEAD"
+        req.accept = "application/json"
+        req.environ['db'] = self.db
+
+        response = req.get_response(self.app)
+
+        self.assertEqual("200 OK", response.status)
+
+    def test_notfound(self):
+        req = Request.blank("/not-found")
+        req.method = "HEAD"
+        req.accept = "application/json"
+
+        req.environ['db'] = self.db
+
+        response = req.get_response(self.app)
+
+        expect = "404 Not Found"
+        result = response.status
 
