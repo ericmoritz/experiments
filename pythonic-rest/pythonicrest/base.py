@@ -43,12 +43,10 @@ class PythonicREST(object):
         elif req.method == "DELETE":
             del resource[key]
 
-    def response(self, req, resource, key):
+    def response(self, req, response, resource, key):
         """Extend this if you want to manipulate the response object before
         it is rendered.  For instance, you can add a Last-Modified header, 
         a custom ETag, etc"""
-        response = Response(request=req)
-        
         data = None
 
         try:
@@ -84,7 +82,8 @@ class PythonicREST(object):
         key = self.key(req)
         
         # Generate the response
-        response = self.response(req, resource, key)
+        response = Response(request=req)
+        response = self.response(req, response, resource, key)
 
         # Render the response
         return self.render_response(response, environ, start_response)
