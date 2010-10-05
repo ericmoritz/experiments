@@ -13,14 +13,20 @@ class Blog(DictMixIn):
         self.db = db
 
     def __getitem__(self, key):
-        # KeyErrors equate to 
+        # KeyErrors equate to a HTTP 404
         return self.db[key]
 
     def __setitem__(self, key, value):
-        pass
+        if key == "/i-cant-find-this":
+            raise KeyError(key)
+
+        if "title" in value and "body" in value:
+            self.db[key] = value
+        else:
+            raise ValueError("title and body are required.")
 
     def __delitem__(self, key):
-        pass
+        del self.db[key]
 
     def __contains__(self, key):
         return key in self.db
