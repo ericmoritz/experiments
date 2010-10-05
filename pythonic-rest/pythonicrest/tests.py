@@ -1,14 +1,13 @@
-from UserDict import DictMixIn, IterableUserDict
+from collections import MutableMapping
 from pythonicrest import PythonicREST
+import unittest
+from webob import Request
+import json
 
-# Our little in-memory no-sql DB :)
-class SimpleNoSQL(IterableUserDict):
-    pass
 
-
-# This is our Blog resource.  We could theorically just use our SimpleNOSQL
-# instance, but I want to illustrate how to build a custom pythonic Resource
-class Blog(DictMixIn):
+# This is our Blog resource.  We could theorically just use standard
+# dictionary, but I want to illustrate how to build a custom pythonic Resource
+class Blog(MutableMapping):
     def __init__(self, db):
         self.db = db
 
@@ -31,6 +30,11 @@ class Blog(DictMixIn):
     def __contains__(self, key):
         return key in self.db
 
+    def __iter__(self):
+        return self.db.__iter__()
+
+    def __len__(self):
+        return self.db.__len__()
 
 def blog_factory(environ):
     # It's up to the factory to determine what key to use to instantiate
@@ -49,7 +53,7 @@ def blog_factory(environ):
 
 class BlogDBBase(unittest.TestCase):
     def setUp(self):
-        self.db = SimpleNoSQL()
+        self.db = {}
         self.db['/simple-blog-post'] = {'title': u"This is a simple post",
                                         'body': u"This is the blog body"}
         self.app = PythonicREST(blog_factory)
@@ -60,11 +64,13 @@ class TestBlogGet(BlogDBBase):
 
     def test_valid(self):
         req = Request.blank("/simple-blog-post")
+        req.environ['db'] = self.db
         req.accept = "application/json"
 
-        response = reg.get_response(self.app)
+        response = req.get_response(self.app)
 
-        data = json.load(response.body)
+        self.assertEqual("200 OK", response.status)
+        data = json.loads(response.body)
 
         expect = self.db['/simple-blog-post']
         result = data
@@ -72,9 +78,10 @@ class TestBlogGet(BlogDBBase):
 
     def test_notfound(self):
         req = Request.blank("/not-found")
+        req.environ['db'] = self.db
         req.accept = "application/json"
 
-        response = reg.get_response(self.app)
+        response = req.get_response(self.app)
 
         expect = "404 Not Found"
         result = response.status
@@ -84,6 +91,8 @@ class TestBlogSet(BlogDBBase):
 
     def test_create(self):
         req = Request.blank("/this-is-new")
+        req.environ['db'] = self.db
+
         req.method = "PUT"
         req.content_type = "application/json"
         req.body = json.dumps({'title': u"This is a new entry",
@@ -95,6 +104,8 @@ class TestBlogSet(BlogDBBase):
 
     def test_update(self):
         req = Request.blank("/simple-blog-post")
+        req.environ['db'] = self.db
+
         req.method = "PUT"
         req.content_type = "application/json"
         req.body = json.dumps({'title': u"I updated your title!",
@@ -108,6 +119,8 @@ class TestBlogSet(BlogDBBase):
         # This is a special slug in my Blog resource that always throws
         # a KeyError
         req = Request.blank("/i-cant-find-this")
+        req.environ['db'] = self.db
+
         req.method = "PUT"
         req.content_type = "application/json"
         req.body = json.dumps({'title': u"This is a new entry",
@@ -119,6 +132,8 @@ class TestBlogSet(BlogDBBase):
 
     def test_invalid(self):
         req = Request.blank("/simple-blog-post")
+        req.environ['db'] = self.db
+
         req.method = "PUT"
         req.content_type = "application/json"
 
@@ -134,6 +149,7 @@ class TestBlogDelete(BlogDBBase):
 
     def test_delete(self):
         req = Request.blank("/simple-blog-post")
+        req.environ['db'] = self.db
         req.method = "DELETE"
 
         resp = req.get_response(self.app)
@@ -144,6 +160,7 @@ class TestBlogDelete(BlogDBBase):
 
     def test_not_found(self):
         req = Request.blank("/nowhere-man")
+        req.environ['db'] = self.db
         req.method = "DELETE"
 
         resp = req.get_response(self.app)
