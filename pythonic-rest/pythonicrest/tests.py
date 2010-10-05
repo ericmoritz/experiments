@@ -208,3 +208,28 @@ class TestBlogHEAD(BlogDBBase):
         expect = "404 Not Found"
         result = response.status
 
+                       
+class TestBlogOPTION(BlogDBBase):
+    
+    def test_valid(self):
+        req = Request.blank("/simple-blog-post")
+        req.method = "OPTION"
+        req.environ['db'] = self.db
+
+        response = req.get_response(self.app)
+
+        self.assertEqual("200 OK", response.status)
+        self.assertEqual(("GET", "PUT", "DELETE", "HEAD", "OPTION"),
+                         response.allow)
+
+    def test_notfound(self):
+        req = Request.blank("/not-found")
+        req.method = "OPTION"
+
+        req.environ['db'] = self.db
+
+        response = req.get_response(self.app)
+
+        expect = "404 Not Found"
+        result = response.status
+

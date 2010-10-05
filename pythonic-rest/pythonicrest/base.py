@@ -55,6 +55,9 @@ class PythonicREST(object):
             # Check the allow() value
             if req.method not in allowed:
                 raise exc.HTTPMethodNotAllowed(allow=allowed)
+
+            if req.method == "OPTION":
+                return Response(allow=allowed)
         
             # Try to get the response, and handle the standard exceptions
             # KeyError = Not Found, ValueError = Bad Request
