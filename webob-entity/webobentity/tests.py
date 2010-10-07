@@ -1,8 +1,59 @@
 import unittest
 from datetime import datetime
-from webobentity import Request, Response, UnknownFormat
+from webobentity import *
 from webob import exc
+import webob
 import json
+
+class TestRequestDataProperty(unittest.TestCase):
+    def test_set(self):
+        data_prop = RequestDataProperty()
+        req = webob.Request.blank("/")
+        req.content_type = "application/json"
+        data = {'test': 1}
+        data_prop.fset(req, data)
+        
+        self.assertTrue(req.body, json.dumps(data))
+
+    def test_get(self):
+        data_prop = RequestDataProperty()
+        req = webob.Request.blank("/")
+        req.content_type = "application/json"
+        data = {'test': 1}
+        req.body = json.dumps(data)
+        result = data_prop.fget(req)
+        
+        self.assertTrue(data, result)
+
+
+class TestResponseDataProperty(unittest.TestCase):
+    def test_set(self):
+        data_prop = ResponseDataProperty()
+        req = webob.Request.blank("/")
+        req.accept = "application/json"
+
+
+        data = {'test': 1}
+        resp = webob.Response()
+        resp.request = req
+
+        data_prop.fset(resp, data)
+        
+        self.assertTrue(resp.body, json.dumps(data))
+
+    def test_get(self):
+        data_prop = ResponseDataProperty()
+        data = {'test': 1}
+
+        resp = webob.Response()
+        resp.content_type = "application/json"
+
+        resp.body = json.dumps(data)
+        result = data_prop.fget(resp)
+        
+        self.assertTrue(data, result)
+
+        
 
 
 class TestRequest(unittest.TestCase):
