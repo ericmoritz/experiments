@@ -1,11 +1,9 @@
-from django.http import HttpResponse
 from django.shortcuts import render_to_response
 
-#from django.core.cache import cache
+# Get the sample fb data
+from cachecompare import sample_fb_data
 
-import urllib
-import json as simplejson
 
 def index(request):
-    return HttpResponse("")
-
+    fb_data = sample_fb_data
+    return render_to_response("index.html", {"data": fb_data})
