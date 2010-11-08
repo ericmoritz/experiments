@@ -44,7 +44,7 @@ Each test case was based on the `so-starving`_ Django application.
 There were two variables in the basic test that needed to be
 eliminated.
 
-.. so-starving: https://github.com/agiliq/so-starving
+.. _so-starving: https://github.com/agiliq/so-starving
 
 The first variable was the Facebook search URI.  I hard-coded the data
 from a request to that URI to eliminate the varience introduced by
