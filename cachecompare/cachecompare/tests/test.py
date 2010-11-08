@@ -86,6 +86,8 @@ class BaseAppTestCase(object):
         
         log.info("Shutting down the %s server" % (testname, ))
         server.terminate()
+        log.info("Waiting 1 second for the server to die")
+        time.sleep(1)
 
         result_filename = rp("%s.ab.txt" % (testname, ))
 
