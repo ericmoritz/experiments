@@ -55,7 +55,7 @@ def abtest(url):
 
 
 class BaseAppTestCase(object):
-    ignore = True
+    ignore = False
 
     def test_primed(self):
         testname = self.testname
@@ -117,7 +117,6 @@ class MiddlewareTest(BaseAppTestCase, unittest.TestCase):
 
 
 class VarnishTest(BaseAppTestCase, unittest.TestCase):
-    ignore = False
     testname = "varnish"
     uri = "http://localhost:10001/"
     server_script = app("middleware/app.py")
