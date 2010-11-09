@@ -1,1 +1,1 @@
-Project moved to `here <https://github.com/ericmoritz/restexperiments/tree/master/cachecompare/>`
+Project moved to `here <https://github.com/ericmoritz/restexperiments/tree/master/cachecompare/>`_
