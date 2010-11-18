@@ -17,3 +17,5 @@ Easy, create a new python module called mylogstream.py
 Then launch it using `gunicorn`_::
 
   gunicorn -k gevent mylogstream
+
+.. _gunicorn: http://gunicorn.org/
