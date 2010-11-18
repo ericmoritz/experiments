@@ -19,3 +19,10 @@ Then launch it using `gunicorn`_::
   gunicorn -k gevent mylogstream
 
 .. _gunicorn: http://gunicorn.org/
+
+For the paranoid
+-----------------
+
+You probably wouldn't want to expose your logs to the open web.  You
+should probably put it behind HTTP Authentication either using a WSGI
+middleware or reverse proxy.
