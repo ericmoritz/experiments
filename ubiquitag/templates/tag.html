@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Details for tag '{{ tag }}'{% endblock %}
+
+
+{% block content %}
+   <ul>
+     {% for doc in cursor %}
+       <li><a href="{{ doc.url }}">{{ doc.title }}</a></li>
+     {% endfor %}
+   </ul>
+{% endblock %}

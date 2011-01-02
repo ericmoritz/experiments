@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<section id="index-content">
+   <article>
+   <header><h1>Ubiquitag!</h1></header>
+   <p>Just add this bookmarklet to your browser!</p>
+   <p>
+     <a href="javascript:{% include "code.js" %}">Ubiquitag!</a></p>
+   </article>
+</section>
+{% endblock %}
