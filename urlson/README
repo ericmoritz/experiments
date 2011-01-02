@@ -1,0 +1,17 @@
+urlson is a very basic dictionary to URL encoder/decoder.
+
+passing the following dictionary to dumps()::
+
+   {'name': 'Test', 'list': [1,2,3]}
+
+Will be produce the following urlencoded string::
+
+   name=Test&list=1&list=2&list=3
+
+Conversely, passing the above urlencoding string to loads() will produce::
+
+   {'name': 'Test', 'list': [1,2,3]}
+
+There is nothing more to it.  It does not support nested dictionaries or
+nested lists, so K.I.S.S.
+
