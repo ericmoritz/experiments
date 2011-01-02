@@ -6,7 +6,7 @@ import webob
 import json
 
 class TestRequestDataProperty(unittest.TestCase):
-    def test_set(self):
+    def test_set_json(self):
         data_prop = RequestDataProperty()
         req = webob.Request.blank("/")
         req.content_type = "application/json"
@@ -15,7 +15,7 @@ class TestRequestDataProperty(unittest.TestCase):
         
         self.assertTrue(req.body, json.dumps(data))
 
-    def test_get(self):
+    def test_get_json(self):
         data_prop = RequestDataProperty()
         req = webob.Request.blank("/")
         req.content_type = "application/json"
@@ -25,9 +25,29 @@ class TestRequestDataProperty(unittest.TestCase):
         
         self.assertTrue(data, result)
 
+    def test_set_urlencoded(self):
+        data_prop = RequestDataProperty()
+        req = webob.Request.blank("/")
+        req.content_type = "application/x-www-form-urlencoded"
+        data = {'test': 1}
+        data_prop.fset(req, data)
+        
+        self.assertTrue(req.body, u"test=1")
+
+    def test_get_urlencoded(self):
+        data = {u"test": u"1"}
+        data_prop = RequestDataProperty()
+        req = webob.Request.blank("/")
+        req.content_type = "application/x-www-form-urlencoded"
+        req.body = "test=1"
+        req.charset = "utf-8"
+        result = data_prop.fget(req)
+        
+        self.assertTrue(data, result)
+
 
 class TestResponseDataProperty(unittest.TestCase):
-    def test_set(self):
+    def test_set_json(self):
         data_prop = ResponseDataProperty()
         req = webob.Request.blank("/")
         req.accept = "application/json"
@@ -41,7 +61,7 @@ class TestResponseDataProperty(unittest.TestCase):
         
         self.assertTrue(resp.body, json.dumps(data))
 
-    def test_get(self):
+    def test_get_json(self):
         data_prop = ResponseDataProperty()
         data = {'test': 1}
 
@@ -53,8 +73,33 @@ class TestResponseDataProperty(unittest.TestCase):
         
         self.assertTrue(data, result)
 
-        
+    def test_set_urlencoded(self):
+        data_prop = ResponseDataProperty()
+        req = webob.Request.blank("/")
+        req.accept = "application/x-www-form-urlencoded"
 
+
+        data = {'test': 1}
+        resp = webob.Response()
+        resp.request = req
+
+        data_prop.fset(resp, data)
+        expect = u"test=1"
+        self.assertTrue(resp.body, expect)
+
+    def test_get_urlencoded(self):
+        data_prop = ResponseDataProperty()
+        data = {'test': 1}
+
+        resp = webob.Response()
+        resp.content_type = "application/x-www-form-urlencoded"
+
+        resp.body = "test=1"
+        resp.charset = "utf-8"
+        result = data_prop.fget(resp)
+        
+        self.assertTrue(data, result)
+        
 
 class TestRequest(unittest.TestCase):
 

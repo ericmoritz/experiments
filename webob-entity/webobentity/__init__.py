@@ -21,7 +21,7 @@ class RequestUBodyProperty(property):
         """
         if not obj.charset or obj.charset == NoDefault:
             raise AttributeError(
-                "You cannot access Response.unicode_body unless charset is set")
+                "You cannot access Request.unicode_body unless charset is set")
 
         body = obj.body
         return body.decode(obj.charset, obj.unicode_errors)
@@ -29,10 +29,10 @@ class RequestUBodyProperty(property):
     def fset(self, obj, value):
         if not obj.charset or obj.charset is NoDefault:
             raise AttributeError(
-                "You cannot access Response.unicode_body unless charset is set")
+                "You cannot access Request.unicode_body unless charset is set")
         if not isinstance(value, unicode):
             raise TypeError(
-                "You can only set Response.unicode_body to a unicode string (not %s)" % type(value))
+                "You can only set Request.unicode_body to a unicode string (not %s)" % type(value))
         obj.body = value.encode(obj.charset)
 
 
@@ -44,9 +44,6 @@ class RequestDataProperty(property):
     def fget(self, obj):
         unicode_body = RequestUBodyProperty()
 
-        assert obj.content_type in self.formatters,\
-            "Can't read content type: %s" % (obj.content_type, )
-            
         try:
             formatter = self.formatters[obj.content_type]
         except KeyError:
@@ -57,15 +54,18 @@ class RequestDataProperty(property):
     def fset(self, obj, doc):
         unicode_body = RequestUBodyProperty()
 
-        assert obj.content_type in self.formatters,\
-            "Can't format content type: %s" % (obj.content_type, )
-            
         try:
             formatter = self.formatters[obj.content_type]
         except KeyError:
             raise UnknownFormat(obj.content_type)
+        result = formatter.dumps(doc)
 
-        unicode_body.fset(obj, formatter.dumps(doc))
+        # If the result is string, it's always UTF-8 by my formatters
+        if type(result) is str:
+            obj.charset = "utf-8"
+            obj.body = result
+        elif type(result) is unicode:
+            unicode_body.fset(obj, result)
 
 class ResponseDataProperty(property):
     def __init__(self, formatters=DEFAULT_FORMATTERS):
@@ -100,8 +100,15 @@ class ResponseDataProperty(property):
             raise exc.HTTPNotAcceptable(content_type)
 
         obj.content_type = content_type
-        obj.unicode_body = formatter.dumps(doc)
+        result = formatter.dumps(doc)
 
+        # Our response always uses utf-8
+        if type(result) is unicode:
+            result = result.encode("utf-8")
+
+        obj.body = result
+        obj.charset = "utf-8"
+            
 
 class RequestMixIn(object):
     data = RequestDataProperty()
